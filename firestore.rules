@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/easymeal/documents {
+    // Функции-помощники
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidEmail(email) {
+      return email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
+    }
+    
+    // Правила для коллекции пользователей
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Правила для верификационных кодов
+    match /verificationCodes/{email} {
+      allow read, write: if true;
+      allow create: if isValidEmail(email);
+    }
+  }
+} 

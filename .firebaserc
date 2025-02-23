@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "easymel",
+    "f": "easymel",
+    "dev": "easymel"
+  },
+  "targets": {},
+  "etags": {}
+}
