@@ -4,18 +4,16 @@ import GoogleSignIn
 import CoreData
 import FirebaseMessaging
 import UserNotifications
+import FirebaseAppCheck
 
 @main
 struct EasyMealApp: App {
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
-    @StateObject private var authService = AuthService()
+    @StateObject private var authService = AuthService.shared
     
     init() {
         // Регистрируем трансформер для массивов строк
         StringArrayValueTransformer.register()
-        
-        // Конфигурация Firebase должна происходить до использования любых сервисов Firebase
-        FirebaseConfig.configure()
     }
     
     var body: some Scene {
@@ -31,15 +29,34 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
-        // Настройка уведомлений
+        // Настройка AppCheck для симулятора
+        #if DEBUG
+        print("Настройка AppCheck для симулятора")
+        let providerFactory = AppCheckDebugProviderFactory()
+        AppCheck.setAppCheckProviderFactory(providerFactory)
+        #endif
+        
+        print("Конфигурация Firebase")
+        FirebaseApp.configure()
+        
+        print("Настройка уведомлений")
         UNUserNotificationCenter.current().delegate = self
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
         UNUserNotificationCenter.current().requestAuthorization(
             options: authOptions,
-            completionHandler: { _, _ in }
+            completionHandler: { granted, error in
+                if let error = error {
+                    print("Ошибка при запросе разрешений для уведомлений: \(error)")
+                } else {
+                    print("Разрешения для уведомлений: \(granted ? "получены" : "отклонены")")
+                }
+            }
         )
+        
+        print("Регистрация для push-уведомлений")
         application.registerForRemoteNotifications()
         
+        print("Настройка Firebase Messaging")
         Messaging.messaging().delegate = self
         
         return true
@@ -55,11 +72,27 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ application: UIApplication,
                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("Получен APNS токен")
         Messaging.messaging().apnsToken = deviceToken
+        
+        print("Запрос FCM токена")
+        Messaging.messaging().token { token, error in
+            if let error = error {
+                print("Ошибка получения FCM токена: \(error)")
+            } else if let token = token {
+                print("FCM токен получен: \(token)")
+            }
+        }
     }
     
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("Firebase registration token: \(String(describing: fcmToken))")
+    func application(_ application: UIApplication,
+                    didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Ошибка регистрации для push-уведомлений: \(error)")
+    }
+    
+    func messaging(_ messaging: Messaging,
+                  didReceiveRegistrationToken fcmToken: String?) {
+        print("Получен новый FCM токен: \(String(describing: fcmToken))")
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter,

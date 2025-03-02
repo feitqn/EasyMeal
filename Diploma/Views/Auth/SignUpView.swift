@@ -9,12 +9,10 @@ struct SignUpView: View {
     @State private var confirmPassword = ""
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var isLoading = false
     @State private var showVerification = false
     @State private var isPasswordVisible = false
     @State private var isConfirmPasswordVisible = false
     @State private var showNetworkAlert = false
-    @State private var retryAction: (() -> Void)?
     
     var body: some View {
         VStack(spacing: 24) {
@@ -33,10 +31,10 @@ struct SignUpView: View {
             
             // Заголовок
             VStack(alignment: .leading, spacing: 8) {
-                Text("Create an account")
+                Text("Создание аккаунта")
                     .font(.title)
                     .fontWeight(.bold)
-                Text("Connect with your friends today!")
+                Text("Присоединяйтесь к нам!")
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
@@ -62,7 +60,7 @@ struct SignUpView: View {
                 HStack {
                     Image(systemName: "person")
                         .foregroundColor(.gray)
-                    TextField("Username", text: $username)
+                    TextField("Имя пользователя", text: $username)
                         .textContentType(.username)
                         .autocapitalization(.none)
                 }
@@ -75,9 +73,9 @@ struct SignUpView: View {
                     Image(systemName: "lock")
                         .foregroundColor(.gray)
                     if isPasswordVisible {
-                        TextField("Password", text: $password)
+                        TextField("Пароль", text: $password)
                     } else {
-                        SecureField("Password", text: $password)
+                        SecureField("Пароль", text: $password)
                     }
                     Button(action: {
                         isPasswordVisible.toggle()
@@ -95,9 +93,9 @@ struct SignUpView: View {
                     Image(systemName: "lock")
                         .foregroundColor(.gray)
                     if isConfirmPasswordVisible {
-                        TextField("Confirm Password", text: $confirmPassword)
+                        TextField("Подтвердите пароль", text: $confirmPassword)
                     } else {
-                        SecureField("Confirm Password", text: $confirmPassword)
+                        SecureField("Подтвердите пароль", text: $confirmPassword)
                     }
                     Button(action: {
                         isConfirmPasswordVisible.toggle()
@@ -116,25 +114,30 @@ struct SignUpView: View {
             Button {
                 signUp()
             } label: {
-                Text("Register")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
+                if authService.isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                } else {
+                    Text("Зарегистрироваться")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                }
             }
             .padding()
             .background(isValidForm ? Color.green : Color.gray)
             .foregroundColor(.white)
             .cornerRadius(12)
             .padding(.horizontal)
-            .disabled(!isValidForm)
+            .disabled(!isValidForm || authService.isLoading)
             
             Spacer()
             
             // Вход
             HStack {
-                Text("Already have an account?")
+                Text("Уже есть аккаунт?")
                     .foregroundColor(.gray)
-                Button("Login") {
+                Button("Войти") {
                     dismiss()
                 }
                 .foregroundColor(.blue)
@@ -148,7 +151,7 @@ struct SignUpView: View {
         }
         .alert("Нет подключения", isPresented: $showNetworkAlert) {
             Button("Повторить") {
-                retryAction?()
+                signUp()
             }
             Button("Отмена", role: .cancel) { }
         } message: {
@@ -171,8 +174,12 @@ struct SignUpView: View {
                 try await authService.sendVerificationCode(email: email, username: username, password: password)
                 showVerification = true
             } catch {
-                errorMessage = "Произошла ошибка при регистрации: \(error.localizedDescription)"
-                showError = true
+                errorMessage = error.localizedDescription
+                if let nsError = error as NSError?, nsError.domain == "NetworkError" {
+                    showNetworkAlert = true
+                } else {
+                    showError = true
+                }
             }
         }
     }
@@ -182,12 +189,6 @@ struct SignUpView: View {
         let passwordIsValid = !password.isEmpty && password.count >= 6
         let passwordsMatch = password == confirmPassword
         let usernameIsValid = !username.isEmpty && username.count >= 3
-        
-        print("Валидация формы:")
-        print("Email (\(email)): \(emailIsValid)")
-        print("Password: \(passwordIsValid)")
-        print("Passwords match: \(passwordsMatch)")
-        print("Username (\(username)): \(usernameIsValid)")
         
         return emailIsValid && passwordIsValid && passwordsMatch && usernameIsValid
     }

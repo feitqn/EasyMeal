@@ -19,6 +19,7 @@ struct ProfileView: View {
     @State private var showLogoutAlert = false
     @State private var showingFAQ = false
     @State private var showingHelp = false
+    @State private var showDeleteAccountAlert = false
     
     private var user: CDUser? {
         users.first
@@ -43,10 +44,10 @@ struct ProfileView: View {
                             .clipShape(Circle())
                         
                         if let user = user {
-                            Text(user.username)
+                            Text(user.username ?? "User")
                                 .font(.title2)
                                 .fontWeight(.semibold)
-                            Text(user.email)
+                            Text(user.email ?? "No email")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -77,7 +78,7 @@ struct ProfileView: View {
                                 } label: {
                                     ProfileDataRow(
                                         title: "Birthday",
-                                        value: formatDate(user.birthday) ?? "Not set",
+                                        value: formatDate(user.birthday),
                                         showDivider: true
                                     )
                                 }
@@ -88,7 +89,7 @@ struct ProfileView: View {
                                 } label: {
                                     ProfileDataRow(
                                         title: "Gender",
-                                        value: user.gender.isEmpty ? "Not set" : user.gender,
+                                        value: user.gender?.isEmpty ?? true ? "Not set" : user.gender ?? "",
                                         showDivider: true
                                     )
                                 }
@@ -175,12 +176,26 @@ struct ProfileView: View {
                     Button {
                         showLogoutAlert = true
                     } label: {
-                        Text("Log out")
+                        Text("Выйти")
                             .font(.headline)
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color(.systemBackground))
+                            .cornerRadius(12)
+                            .shadow(radius: 2)
+                    }
+                    
+                    // Кнопка удаления аккаунта
+                    Button {
+                        showDeleteAccountAlert = true
+                    } label: {
+                        Text("Удалить аккаунт")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red)
                             .cornerRadius(12)
                             .shadow(radius: 2)
                     }
@@ -234,10 +249,21 @@ struct ProfileView: View {
             } message: {
                 Text("Вы уверены, что хотите выйти?")
             }
+            
+            .alert("Удаление аккаунта", isPresented: $showDeleteAccountAlert) {
+                Button("Отмена", role: .cancel) { }
+                Button("Удалить", role: .destructive) {
+                    Task {
+                        try? await authService.deleteCurrentUser()
+                    }
+                }
+            } message: {
+                Text("Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.")
+            }
         }
     }
     
-    private func formatDate(_ date: Date?) -> String? {
+    private func formatDate(_ date: Date?) -> String {
         guard let date = date else { return "Not set" }
         let formatter = DateFormatter()
         formatter.dateStyle = .long

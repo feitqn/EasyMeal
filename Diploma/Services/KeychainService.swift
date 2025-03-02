@@ -12,52 +12,42 @@ class KeychainService {
     
     private init() {}
     
-    func save(_ token: String, for userId: String) throws {
+    func save(_ value: String, for key: String) {
+        let data = value.data(using: .utf8)!
+        
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: userId,
-            kSecValueData as String: token.data(using: .utf8)!
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data
         ]
         
-        let status = SecItemAdd(query as CFDictionary, nil)
-        
-        if status == errSecDuplicateItem {
-            let updateQuery: [String: Any] = [
-                kSecClass as String: kSecClassGenericPassword,
-                kSecAttrAccount as String: userId
-            ]
-            
-            let attributes: [String: Any] = [
-                kSecValueData as String: token.data(using: .utf8)!
-            ]
-            
-            SecItemUpdate(updateQuery as CFDictionary, attributes as CFDictionary)
-        }
+        SecItemDelete(query as CFDictionary)
+        SecItemAdd(query as CFDictionary, nil)
     }
     
-    func getToken(for userId: String) -> String? {
+    func getValue(for key: String) -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: userId,
-            kSecReturnData as String: true
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: kCFBooleanTrue!,
+            kSecMatchLimit as String: kSecMatchLimitOne
         ]
         
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        var dataTypeRef: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
         
-        guard status == errSecSuccess,
-              let data = result as? Data,
-              let token = String(data: data, encoding: .utf8) else {
-            return nil
+        if status == errSecSuccess {
+            if let data = dataTypeRef as? Data {
+                return String(data: data, encoding: .utf8)
+            }
         }
-        
-        return token
+        return nil
     }
     
-    func deleteToken(for userId: String) throws {
+    func delete(for key: String) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: userId
+            kSecAttrAccount as String: key
         ]
         
         SecItemDelete(query as CFDictionary)

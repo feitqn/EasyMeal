@@ -3,7 +3,7 @@ import Combine
 
 struct ForgotPasswordView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var authService = AuthService()
+    @StateObject private var authService = AuthService.shared
     @State private var email = ""
     @State private var errorMessage = ""
     @State private var showError = false

@@ -21,7 +21,9 @@ struct OnboardingCompletedView: View {
             }
             
             Button {
-                authService.isOnboardingCompleted = true
+                withAnimation {
+                    authService.isOnboardingCompleted = true
+                }
             } label: {
                 Text("Get Started")
                     .font(.title3)
@@ -36,4 +38,9 @@ struct OnboardingCompletedView: View {
         }
         .padding()
     }
+}
+
+#Preview {
+    OnboardingCompletedView()
+        .environmentObject(AuthService.shared)
 } 

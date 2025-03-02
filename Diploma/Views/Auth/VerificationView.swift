@@ -8,7 +8,6 @@ struct VerificationView: View {
     @State private var verificationCode = ""
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var isLoading = false
     @State private var showSuccess = false
     
     var body: some View {
@@ -28,10 +27,10 @@ struct VerificationView: View {
             
             // Заголовок
             VStack(alignment: .leading, spacing: 8) {
-                Text("Enter Verification Code")
+                Text("Введите код верификации")
                     .font(.title)
                     .fontWeight(.bold)
-                Text("We have sent the code verification to your email address")
+                Text("Мы отправили код подтверждения на вашу почту")
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
@@ -40,7 +39,7 @@ struct VerificationView: View {
             
             // Код верификации
             VStack(spacing: 16) {
-                TextField("Enter verification code", text: $verificationCode)
+                TextField("Введите код подтверждения", text: $verificationCode)
                     .keyboardType(.numberPad)
                     .font(.title2)
                     .multilineTextAlignment(.center)
@@ -54,11 +53,11 @@ struct VerificationView: View {
             Button {
                 verifyCode()
             } label: {
-                if isLoading {
+                if authService.isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 } else {
-                    Text("Verify")
+                    Text("Подтвердить")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
@@ -69,16 +68,17 @@ struct VerificationView: View {
             .foregroundColor(.white)
             .cornerRadius(12)
             .padding(.horizontal)
-            .disabled(isLoading || verificationCode.count != 6)
+            .disabled(authService.isLoading || verificationCode.count != 6)
             
             // Повторная отправка кода
             HStack {
-                Text("Didn't receive code?")
+                Text("Не получили код?")
                     .foregroundColor(.gray)
-                Button("Resend") {
+                Button("Отправить повторно") {
                     resendCode()
                 }
                 .foregroundColor(.blue)
+                .disabled(authService.isLoading)
             }
             
             Spacer()
@@ -94,12 +94,35 @@ struct VerificationView: View {
     }
     
     private func verifyCode() {
+        guard !verificationCode.isEmpty else {
+            errorMessage = "Пожалуйста, введите код верификации"
+            showError = true
+            return
+        }
+        
         Task {
             do {
-                try await authService.verifyCode(verificationCode)
-                showSuccess = true
+                if try await authService.verifyCode(verificationCode) {
+                    showSuccess = true
+                } else {
+                    errorMessage = "Неверный код верификации. Пожалуйста, проверьте код и попробуйте снова."
+                    showError = true
+                }
             } catch {
-                errorMessage = "Неверный код верификации"
+                if let nsError = error as NSError? {
+                    switch nsError.domain {
+                    case "AuthError":
+                        errorMessage = nsError.localizedDescription
+                    case "NetworkError":
+                        errorMessage = "Проверьте подключение к интернету и попробуйте снова"
+                    case "CloudFunctionsError":
+                        errorMessage = "Ошибка сервера. Пожалуйста, попробуйте позже."
+                    default:
+                        errorMessage = "Произошла ошибка при проверке кода. Попробуйте позже."
+                    }
+                } else {
+                    errorMessage = error.localizedDescription
+                }
                 showError = true
             }
         }
@@ -107,17 +130,34 @@ struct VerificationView: View {
     
     private func resendCode() {
         Task {
-            do {
-                if let tempData = authService.tempUserData {
+            if let tempData = authService.tempUserData {
+                do {
                     try await authService.sendVerificationCode(
-                        email: email,
+                        email: tempData.email,
                         username: tempData.username,
                         password: tempData.password
                     )
+                    DispatchQueue.main.async {
+                        self.errorMessage = "Новый код верификации отправлен на вашу почту"
+                        self.showError = true
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        if let nsError = error as NSError? {
+                            switch nsError.domain {
+                            case "NetworkError":
+                                self.errorMessage = "Проверьте подключение к интернету"
+                            case "CloudFunctionsError":
+                                self.errorMessage = "Ошибка при отправке кода. Попробуйте позже."
+                            default:
+                                self.errorMessage = nsError.localizedDescription
+                            }
+                        } else {
+                            self.errorMessage = error.localizedDescription
+                        }
+                        self.showError = true
+                    }
                 }
-            } catch {
-                errorMessage = "Не удалось отправить код повторно"
-                showError = true
             }
         }
     }

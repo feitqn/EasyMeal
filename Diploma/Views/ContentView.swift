@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var authService = AuthService()
+    @EnvironmentObject private var authService: AuthService
     
     var body: some View {
         NavigationView {
@@ -18,4 +18,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-}
+        .environmentObject(AuthService.shared)
+} 

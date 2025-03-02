@@ -19,6 +19,9 @@ class SettingsService: ObservableObject {
         static let mealNotificationsEnabled = "mealNotificationsEnabled"
         static let theme = "theme"
         static let language = "language"
+        static let isDarkModeEnabled = "isDarkModeEnabled"
+        static let measurementSystem = "measurementSystem"
+        static let lastSyncDate = "lastSyncDate"
     }
     
     // MARK: - First Launch
@@ -66,6 +69,30 @@ class SettingsService: ObservableObject {
         set { defaults.set(newValue.rawValue, forKey: Keys.language) }
     }
     
+    // MARK: - User Settings
+    
+    var isDarkModeEnabled: Bool {
+        get { defaults.bool(forKey: Keys.isDarkModeEnabled) }
+        set { defaults.set(newValue, forKey: Keys.isDarkModeEnabled) }
+    }
+    
+    var measurementSystem: MeasurementSystem {
+        get {
+            if let rawValue = defaults.string(forKey: Keys.measurementSystem) {
+                return MeasurementSystem(rawValue: rawValue) ?? .metric
+            }
+            return .metric
+        }
+        set { defaults.set(newValue.rawValue, forKey: Keys.measurementSystem) }
+    }
+    
+    // MARK: - App Settings
+    
+    var lastSyncDate: Date? {
+        get { defaults.object(forKey: Keys.lastSyncDate) as? Date }
+        set { defaults.set(newValue, forKey: Keys.lastSyncDate) }
+    }
+    
     // MARK: - Reset
     func resetAllSettings() {
         let domain = Bundle.main.bundleIdentifier!
@@ -82,4 +109,14 @@ class SettingsService: ObservableObject {
         mealNotificationsEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: "mealNotificationsEnabled")
     }
+    
+    func clearAllSettings() {
+        let domain = Bundle.main.bundleIdentifier!
+        defaults.removePersistentDomain(forName: domain)
+    }
+}
+
+enum MeasurementSystem: String {
+    case metric = "metric"
+    case imperial = "imperial"
 } 
