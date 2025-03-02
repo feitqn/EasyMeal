@@ -1,67 +1,50 @@
-# EasyMeal - iOS Fitness & Nutrition App
+# EasyMeal - Your Personal Nutrition Assistant
 
-EasyMeal is a comprehensive iOS application designed to help users track their fitness goals, nutrition, and daily activities. Built with SwiftUI and leveraging Firebase for backend services.
+## Latest Updates (Week of March 2024)
+
+### New Features
+- Added comprehensive onboarding process after successful registration
+- Implemented user profile setup with:
+  - Weight selection
+  - Height input
+  - Fitness goal selection (weight loss, maintenance, or gain)
+- Enhanced email verification system with secure code delivery
+- Improved Cloud Functions integration for verification process
+- Added better error handling and network state monitoring
+
+### Technical Improvements
+- Updated Firebase Cloud Functions to v2
+- Enhanced error handling across the application
+- Improved network request management
+- Added proper UI state handling for loading and error states
+
+## About
+EasyMeal is an iOS application designed to help users maintain a healthy lifestyle through proper nutrition tracking and meal planning.
 
 ## Features
-
-- User Authentication (Email, Google Sign-In)
-- Personalized User Profiles
-- Workout Tracking
-- Meal Planning and Recipes
-- Progress Monitoring
-- Daily Activity Tracking
-- Customizable Goals
+- User authentication with email and Google Sign-In
+- Email verification system
+- Personalized user profiles
+- Goal-based nutrition recommendations
+- Progress tracking
+- Meal planning and tracking
+- Recipe suggestions
 
 ## Technical Stack
-
-- SwiftUI
-- Firebase (Authentication, Firestore, Storage)
-- Core Data
-- Google Sign-In
-- Swift Package Manager for Dependencies
-
-## Requirements
-
-- iOS 15.0+
-- Xcode 13.0+
-- Swift 5.5+
+- SwiftUI for UI
+- Firebase (Auth, Firestore, Cloud Functions)
+- Core Data for local storage
+- Combine for reactive programming
+- Google Sign-In integration
 
 ## Installation
-
 1. Clone the repository
-```bash
-git clone https://github.com/YOUR_USERNAME/EasyMeal.git
-```
-
-2. Open `EasyMeal.xcodeproj` in Xcode
-
-3. Install dependencies via Swift Package Manager
-
-4. Add your `GoogleService-Info.plist` file to the project
-
-5. Build and run the project
-
-## Configuration
-
-Make sure to configure the following:
-
-1. Firebase setup in your project
-2. Google Sign-In credentials
-3. Core Data model
-4. Required API keys and configurations
-
-## Architecture
-
-The app follows MVVM architecture pattern and uses:
-- SwiftUI for UI
-- Core Data for local storage
-- Firebase for backend services
-- Combine for reactive programming
+2. Install dependencies using CocoaPods
+3. Set up Firebase configuration
+4. Run the project in Xcode
 
 ## Contributing
-
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
-
-This project is licensed under the MIT License - see the LICENSE file for details 
+This project is licensed under the MIT License - see the LICENSE file for details. 
