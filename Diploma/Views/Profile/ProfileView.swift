@@ -5,10 +5,10 @@ struct ProfileView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject private var authService: AuthService
     @FetchRequest(
-        entity: CDUser.entity(),
+        entity: User.entity(),
         sortDescriptors: [],
         animation: .default
-    ) private var users: FetchedResults<CDUser>
+    ) private var users: FetchedResults<User>
     
     @State private var showEditGoal = false
     @State private var showEditBirthday = false
@@ -21,7 +21,7 @@ struct ProfileView: View {
     @State private var showingHelp = false
     @State private var showDeleteAccountAlert = false
     
-    private var user: CDUser? {
+    private var user: User? {
         users.first
     }
     
@@ -30,18 +30,20 @@ struct ProfileView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Логотип
-                    Image("logo")
+                    Image(systemName: "leaf.circle")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
+                        .foregroundColor(.green)
                     
                     // Аватар и имя пользователя
                     VStack(spacing: 8) {
-                        Image("avatar-placeholder")
+                        Image(systemName: "person.circle.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 100, height: 100)
                             .clipShape(Circle())
+                            .foregroundColor(.gray)
                         
                         if let user = user {
                             Text(user.username ?? "User")

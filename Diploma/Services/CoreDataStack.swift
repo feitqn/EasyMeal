@@ -78,7 +78,7 @@ class CoreDataStack {
                 try context.save()
             } catch {
                 let nserror = error as NSError
-                print("Ошибка сохранения контекста: \(nserror), \(nserror.userInfo)")
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }

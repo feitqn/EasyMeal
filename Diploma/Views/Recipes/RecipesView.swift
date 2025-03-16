@@ -4,20 +4,20 @@ import CoreData
 struct RecipesView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \CDRecipe.createdAt, ascending: false)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Recipe.createdAt, ascending: false)],
         animation: .default
-    ) private var recipes: FetchedResults<CDRecipe>
+    ) private var recipes: FetchedResults<Recipe>
     
     @State private var selectedCategory: RecipeCategory?
     @State private var searchText = ""
     
-    private var filteredRecipes: [CDRecipe] {
+    private var filteredRecipes: [Recipe] {
         recipes.filter { recipe in
             let matchesSearch = searchText.isEmpty || 
                 recipe.name.localizedCaseInsensitiveContains(searchText)
             
             let matchesCategory = selectedCategory == nil || 
-                recipe.category == selectedCategory
+                recipe.categoryRawValue == selectedCategory?.rawValue
                 
             return matchesSearch && matchesCategory
         }
@@ -55,7 +55,9 @@ struct RecipesView: View {
                 // Список рецептов
                 List {
                     ForEach(filteredRecipes, id: \.id) { recipe in
-                        NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                        NavigationLink {
+                            RecipeDetailView(recipe: recipe)
+                        } label: {
                             RecipeRowView(recipe: recipe)
                         }
                     }
@@ -90,11 +92,11 @@ struct CategoryButton: View {
 }
 
 struct RecipeRowView: View {
-    let recipe: CDRecipe
+    let recipe: Recipe
     
     var body: some View {
         HStack {
-            AsyncImage(url: URL(string: recipe.imageURL)) { image in
+            AsyncImage(url: URL(string: recipe.imageURL ?? "")) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)

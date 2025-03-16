@@ -1,29 +1,48 @@
 import Foundation
 import CoreData
 
-@objc(CDRecipe)
-public class CDRecipe: NSManagedObject {
+@objc(Recipe)
+public class Recipe: NSManagedObject {
     @NSManaged public var id: String
     @NSManaged public var name: String
-    @NSManaged public var imageURL: String
+    @NSManaged public var imageURL: String?
     @NSManaged public var cookingTime: Int32
     @NSManaged public var difficulty: String
     @NSManaged public var calories: Int32
     @NSManaged public var protein: Double
     @NSManaged public var fats: Double
     @NSManaged public var carbs: Double
-    @NSManaged public var ingredients: [String]?
-    @NSManaged public var steps: [String]?
+    @NSManaged private var ingredientsArray: NSArray?
+    @NSManaged private var stepsArray: NSArray?
     @NSManaged public var categoryRawValue: String
     @NSManaged public var createdAt: Date
     @NSManaged public var updatedAt: Date
     
     public override func awakeFromInsert() {
         super.awakeFromInsert()
-        ingredients = []
-        steps = []
+        ingredientsArray = []
+        stepsArray = []
         createdAt = Date()
         updatedAt = Date()
+        categoryRawValue = RecipeCategory.breakfast.rawValue
+    }
+    
+    var ingredients: [String]? {
+        get {
+            ingredientsArray as? [String]
+        }
+        set {
+            ingredientsArray = newValue as NSArray?
+        }
+    }
+    
+    var steps: [String]? {
+        get {
+            stepsArray as? [String]
+        }
+        set {
+            stepsArray = newValue as NSArray?
+        }
     }
     
     var category: RecipeCategory {
@@ -36,9 +55,9 @@ public class CDRecipe: NSManagedObject {
     }
 }
 
-extension CDRecipe {
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<CDRecipe> {
-        return NSFetchRequest<CDRecipe>(entityName: "CDRecipe")
+extension Recipe {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Recipe> {
+        return NSFetchRequest<Recipe>(entityName: "Recipe")
     }
 }
 

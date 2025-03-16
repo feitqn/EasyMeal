@@ -7,16 +7,7 @@ struct WelcomeView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            // Верхняя часть с изображениями продуктов
-            Image("welcome-food")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(height: 300)
-            
-            // Логотип
-            Image("leaf-logo")
-                .resizable()
-                .frame(width: 50, height: 50)
+            Spacer()
             
             // Приветственный текст
             VStack(spacing: 8) {

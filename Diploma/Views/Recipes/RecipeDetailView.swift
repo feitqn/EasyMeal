@@ -1,13 +1,14 @@
 import SwiftUI
+import CoreData
 
 struct RecipeDetailView: View {
-    let recipe: CDRecipe
+    let recipe: Recipe
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 // Изображение рецепта
-                AsyncImage(url: URL(string: recipe.imageURL)) { image in
+                AsyncImage(url: URL(string: recipe.imageURL ?? "")) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)

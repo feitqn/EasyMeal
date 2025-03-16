@@ -15,7 +15,7 @@ class AuthService: ObservableObject {
     private let db = Firestore.firestore()
     private let functions = Functions.functions(region: "europe-west1")
     
-    @Published var user: User?
+    @Published var user: FirebaseAuth.User?
     @Published var isAuthenticated = false
     @Published var networkError: Error?
     @Published var isOnboardingCompleted = false
