@@ -8,7 +8,6 @@ class ProfileViewModel: ObservableObject {
         self.user = user
     }
 
-    // Example action: logout
     func logout() {
         // Implement logout logic
         print("Logout tapped")

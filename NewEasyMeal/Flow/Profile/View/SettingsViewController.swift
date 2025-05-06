@@ -1,5 +1,6 @@
 import UIKit
 
+
 struct SettingsNavigation {
     var onExitTap: Callback
     var editAction: Callback
@@ -33,9 +34,6 @@ class SettingsViewController: UIViewController {
     }
     
     func navigate() {
-//        let vc = OnBoardingViewController(navigation: OnBoardingNavigation(onExit: {
-//            self.navigationController?.popViewController(animated: true)
-//        }), viewModel: OnBoardingViewModel(profile: profile))
-//        self.navigationController?.pushViewController(vc, animated: true)
+
     }
 }

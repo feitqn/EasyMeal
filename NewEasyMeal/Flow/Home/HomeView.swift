@@ -16,7 +16,7 @@ struct HomeView: View {
                         shape: .rounded(.radius(40, style: .circular))
                     )
 
-                // Header
+        
                 HStack {
                     Text("Food Diary")
                         .font(.largeTitle)
@@ -26,7 +26,7 @@ struct HomeView: View {
                     Spacer()
                 }
                 
-                // Calorie summary card
+         
                 CalorieSummaryCardView(
                     nutritionData: viewModel.nutritionData,
                     eatenCalories: viewModel.eaten,

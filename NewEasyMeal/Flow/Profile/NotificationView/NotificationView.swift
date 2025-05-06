@@ -7,7 +7,7 @@ struct NotificationView: View {
             // Header
             HStack {
                 Button(action: {
-                    // Back button action
+               
                 }) {
                     Image(systemName: "chevron.left")
                         .padding()
