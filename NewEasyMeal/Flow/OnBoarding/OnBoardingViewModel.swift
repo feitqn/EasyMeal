@@ -21,7 +21,6 @@ enum Gender: String, CaseIterable, Identifiable {
     }
 }
 
-// OnboardingViewModel.swift
 class OnboardingViewModel: ObservableObject {
     @Published var step: OnboardingStep = .goal
     @Published var selectedGoal: WeightGoal?

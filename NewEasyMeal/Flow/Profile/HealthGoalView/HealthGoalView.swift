@@ -7,7 +7,7 @@ struct HealthGoalsView: View {
     @State private var targetWeight = "60 kg"
     @State private var weeklyGoal = "-0.5 kg"
     @State private var dailyCalories = "2100 kcal"
-    @State private var steps = "2100 kcal"  // Note: this appears to be an error in the UI mockup
+    @State private var steps = "2100 kcal"  
     @State private var water = "2100 kcal"  // Note: this appears to be an error in the UI mockup
     
     var body: some View {

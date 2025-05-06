@@ -15,7 +15,7 @@ class PersonalInfoViewModel: ObservableObject {
     }
     
     func saveChanges() {
-        // Здесь логика сохранения данных (например, отправка на сервер)
+    
         print("Saved: \(username), \(email), \(gender.rawValue), \(birthday)")
     }
 }

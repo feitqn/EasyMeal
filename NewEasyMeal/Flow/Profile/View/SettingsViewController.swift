@@ -1,6 +1,5 @@
 import UIKit
 
-
 struct SettingsNavigation {
     var onExitTap: Callback
     var editAction: Callback

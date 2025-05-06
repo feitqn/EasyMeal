@@ -17,6 +17,5 @@ class SelectGoalViewModel: ObservableObject {
     func continueTapped() {
         guard let goal = selectedGoal else { return }
         print("User selected goal: \(goal.rawValue)")
-        // Можно вызывать navigation или delegate
     }
 }

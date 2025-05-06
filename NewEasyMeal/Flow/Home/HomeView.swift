@@ -9,7 +9,6 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Greeting header
                 GreetingHeaderView(userName: UserManager.shared.getUserProfile()?.name ?? "")
                     .skeleton(
                         with: viewModel.isLoading,

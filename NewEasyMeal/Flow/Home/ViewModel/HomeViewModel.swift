@@ -15,9 +15,9 @@ final class HomeViewModel: ObservableObject {
     
     @Published var weeklyTrackers = [
         WeeklyTracker(title: "Track Your Water Intake", goal: "2.00 L", color: Color.blue, iconName: "drop.fill", daysCompleted: 0)
-//        ,
-//        WeeklyTracker(title: "Track Your Weekly Fruit Intake", goal: "1 or 2 fruits per day", color: AppColors.fruitColor, iconName: "apple.logo", daysCompleted: 0),
-//        WeeklyTracker(title: "Track Your Weekly Vegetable Intake", goal: "1 or 2 vegetables per day", color: AppColors.vegetableColor, iconName: "leaf.fill", daysCompleted: 0),
+      ,
+       WeeklyTracker(title: "Track Your Weekly Fruit Intake", goal: "1 or 2 fruits per day", color: AppColors.fruitColor, iconName: "apple.logo", daysCompleted: 0),
+       WeeklyTracker(title: "Track Your Weekly Vegetable Intake", goal: "1 or 2 vegetables per day", color: AppColors.vegetableColor, iconName: "leaf.fill", daysCompleted: 0),
 //        WeeklyTracker(title: "Track Your Weekly Protein Intake", goal: "0.8g per kg of body weight", color: AppColors.proteinTrackerColor, iconName: "takeoutbag.and.cup.and.straw.fill", daysCompleted: 0),
 //        WeeklyTracker(title: "Track Your Steps Weekly", goal: "10000", color: AppColors.stepsColor, iconName: "figure.walk", daysCompleted: 0),
 //        WeeklyTracker(title: "Weekly No Sugar Challenge", goal: "0g of added sugar per day", color: AppColors.noSugarColor, iconName: "circle", daysCompleted: 0),
