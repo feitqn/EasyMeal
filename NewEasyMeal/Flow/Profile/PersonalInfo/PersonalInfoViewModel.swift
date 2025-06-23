@@ -1,10 +1,12 @@
 import SwiftUI
 
+@MainActor
 class PersonalInfoViewModel: ObservableObject {
-    @Published var username: String = "Aiganym"
-    @Published var email: String = "aiganym@gmail.com"
-    @Published var gender: Gender = .female
-    @Published var birthday: Date = DateComponents(calendar: Calendar.current, year: 1982, month: 4, day: 15).date ?? Date()
+    @Published var username = UserManager.shared.name
+    @Published var email = UserManager.shared.getUserProfile()?.email ?? ""
+    @Published var gender = UserManager.shared.getUserProfile()?.gender ?? "male"
+    @Published var birthDate = UserManager.shared.getUserProfile()?.birthDate ?? Date()
+    @Published var showBackButton = true
 
     enum Gender: String, CaseIterable, Identifiable {
         case female = "Female"
@@ -14,8 +16,44 @@ class PersonalInfoViewModel: ObservableObject {
         var id: String { self.rawValue }
     }
     
-    func saveChanges() {
-    
-        print("Saved: \(username), \(email), \(gender.rawValue), \(birthday)")
+    func saveChanges(completion: @escaping Callback) {
+        guard !username.isEmpty, !gender.isEmpty else {
+            return
+        }
+
+        Task {
+            do {
+                try await APIHelper.shared.updateUserProfileFields(
+                    userId: UserManager.shared.userId,
+                    fieldsToUpdate: [
+                        "name": username,
+                        "gender": gender,
+                        "birthDate": Int(birthDate.timeIntervalSince1970)
+                    ]
+                )
+                NotificationCenter.default.post(name: .getProfile, object: self)
+                completion()
+            } catch {
+                print("Ошибка обновления профиля: \(error)")
+            }
+        }
+    }
+}
+
+extension Binding<Date> {
+    func mapToString(format: String = "yyyy-MM-dd") -> Binding<String> {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        
+        return Binding<String>(
+            get: {
+                formatter.string(from: self.wrappedValue)
+            },
+            set: { newValue in
+                if let date = formatter.date(from: newValue) {
+                    self.wrappedValue = date
+                }
+            }
+        )
     }
 }

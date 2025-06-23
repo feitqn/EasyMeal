@@ -77,13 +77,6 @@ enum AppFonts {
     static let body = Font.body
 }
 
-struct NutritionInfo: Identifiable {
-    let id = UUID()
-    let protein: Int
-    let carbs: Int
-    let fats: Int
-}
-
 struct MealInfo: Identifiable {
     let id = UUID()
     let title: String
@@ -108,12 +101,27 @@ struct TrackerInfo: Identifiable {
     let progress: CGFloat
 }
 
-struct WeeklyTracker: Identifiable {
-    let id = UUID()
+struct Tracker: Identifiable, Codable {
+    let id: String
     let title: String
     let goal: String
-    let color: Color
-    let iconName: String
-    let daysCompleted: Int
-    let totalDays: Int = 7
+    let type: String
+    
+    var trackerType: TrackerType {
+        switch type {
+        case "water": return .water
+        case "fruit": return .fruit
+        case "vegetable": return .vegetable
+        case "protein": return .protein
+        case "steps": return .steps
+        case "noSugar": return .noSugar
+        case "noFastFood": return .noFastFood
+        case "noLateNightEating": return .noLateNightEating
+        default: return .water
+        }
+    }
+}
+
+enum CustomIconType {
+    case water, fruit, vegetable, protein, steps, sugarChallenge, fastFood, lateNight
 }

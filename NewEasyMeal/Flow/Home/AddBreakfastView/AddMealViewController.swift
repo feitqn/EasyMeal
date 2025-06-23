@@ -38,13 +38,14 @@ class AddMealViewController: UIViewController {
             try await APIHelper.shared.addMeal(for: mealType, and: foodItem)
             await MainActor.run {
                 showFoodActionAlert(type: .success)
+                NotificationCenter.default.post(name: .getProfile, object: self)
             }
         }
     }
 
     private func showFoodActionAlert(type: FoodActionResultType) {
         guard let window = view.window else { return }
-
+        
         let alertView = FoodActionAlertView(type: type)
         alertView.translatesAutoresizingMaskIntoConstraints = false
         alertView.alpha = 0

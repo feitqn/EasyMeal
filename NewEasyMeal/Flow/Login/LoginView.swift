@@ -4,8 +4,11 @@ struct LoginView: View {
     @ObservedObject var viewModel: LoginViewModel
     var onButtonTapped: (String, String) -> ()
     var onRegisterTapped: Callback
+    var onGoogleTapped: Callback
     @State var isSecured: Bool = true
     @State private var textWidth: CGFloat = 0
+    @State private var showAlert = false
+
 
     var body: some View {
         VStack(alignment: .center) {
@@ -61,15 +64,15 @@ struct LoginView: View {
                 .padding(.top, 12)
             
             HStack(spacing: 16) {
-                IconButton(imageName: "facebook") {
-                    print("Home tapped")
-                }
+//                IconButton(imageName: "facebook") {
+//                    showAlert.toggle()
+//                }
                 IconButton(imageName: "google") {
-                    print("Heart tapped")
+                    onGoogleTapped()
                 }
-                IconButton(imageName: "apple") {
-                    print("Settings tapped")
-                }
+//                IconButton(imageName: "apple") {
+//                    showAlert.toggle()
+//                }
             }.padding(.top, 12)
             
             
@@ -98,6 +101,11 @@ struct LoginView: View {
                 
             }
             .padding(.top, 133)
+        }
+        .alert("Comming soon", isPresented: $showAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("This feature will be available in the next release.")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -141,6 +149,6 @@ struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView(viewModel: LoginViewModel(),
                   onButtonTapped: {_,_ in},
-                  onRegisterTapped: {})
+                  onRegisterTapped: {}, onGoogleTapped: {})
     }
 }

@@ -5,6 +5,7 @@ struct RegisterView: View {
     @ObservedObject var viewModel: RegisterViewModel
     var action: Callback
     var completion: Callback
+    var onGoogleTapped: Callback
     var body: some View {
         VStack(alignment: .center) {
             HStack {
@@ -67,7 +68,7 @@ struct RegisterView: View {
                     print("Home tapped")
                 }
                 IconButton(imageName: "google") {
-                    print("Heart tapped")
+                    onGoogleTapped()
                 }
                 IconButton(imageName: "apple") {
                     print("Settings tapped")
@@ -95,7 +96,7 @@ struct RegisterView: View {
 
 struct RegisterView_Previews: PreviewProvider {
     static var previews: some View {
-        RegisterView(viewModel: RegisterViewModel(), action: {}, completion: {})
+        RegisterView(viewModel: RegisterViewModel(), action: {}, completion: {}, onGoogleTapped: {})
     }
 }
 

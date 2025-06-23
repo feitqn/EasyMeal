@@ -13,7 +13,7 @@ struct Nutrition: Codable, Identifiable {
     let current: Int
     
     var remainingText: String {
-        return "\(target - current) kcal"
+        return "\(max(0, target - current))g left"
     }
 
     var progress: CGFloat {
@@ -32,14 +32,17 @@ struct WaterIntake: Codable {
 }
 
 struct FoodDiary: Codable {
-    var eatenCalories: Int
-    var burnedCalories: Int
-    var remainingCalories: Int
-    var meals: [Meal]
-    var nutrition: [Nutrition]
-    var steps: Steps
-    var exercise: Exercise
-    var waterIntake: WaterIntake
+    var overallCalories: Int?
+    var eatenCalories: Int?
+    var burnedCalories: Int?
+    var remainingCalories: Int?
+    var meals: [Meal]?
+    var nutrition: [Nutrition]?
+    var steps: Steps?
+    var exercise: Exercise?
+    var waterIntake: WaterIntake?
+    var trackers: [TrackerData]?
+    var currentWeight: Double?
     
     static func generatePlan(weight: Double, targetWeight: Double, goal: WeightGoal) -> Self {
         var baseCalories = weight * 22.0 * 1.3
@@ -83,6 +86,7 @@ struct FoodDiary: Codable {
         let waterGoal = round((weight * 35 / 1000) * 10) / 10
         
         return FoodDiary(
+            overallCalories: dailyCalories,
             eatenCalories: 0,
             burnedCalories: 0,
             remainingCalories: dailyCalories,
@@ -90,7 +94,9 @@ struct FoodDiary: Codable {
             nutrition: nutriotion,
             steps: Steps(current: 0, target: stepsGoal),
             exercise: Exercise(kcal: 0, duration: 0),
-            waterIntake: WaterIntake(target: waterGoal, current: 0))
+            waterIntake: WaterIntake(target: waterGoal, current: 0),
+            trackers: [],
+            currentWeight: weight)
     }
 }
 

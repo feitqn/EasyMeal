@@ -22,46 +22,68 @@ struct ProfileView: View {
                 }
                 .padding()
             }
+            .padding(.top, 1)
             .navigationBarTitle("Profile", displayMode: .large)
     }
 
     // MARK: - Header
     private var headerSection: some View {
-        HStack(alignment: .center, spacing: 16) {
-            Image(systemName: "pencil")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 72, height: 72)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.blue, lineWidth: 3))
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.user?.name ?? "")
-                    .font(.title2).bold()
-                Text("viewModel.user.email")
-                    .font(.subheadline).foregroundColor(.gray)
-
-                HStack(spacing: 12) {
-                    Label(viewModel.user?.currentGoal ?? "", systemImage: "arrow.up.right")
-                        .labelStyle(IconOnlyLabelStyle())
-                        .foregroundColor(.green)
-                    Text("\(viewModel.user?.currentGoal?.capitalized ?? "")")
-                        .font(.subheadline)
-
-                    Label("", systemImage: "scalemass")
-                        .labelStyle(TitleOnlyLabelStyle())
-                    Text(String(format: "%.1f kg", viewModel.user?.weight ?? ""))
-                        .font(.subheadline)
-
-                    Label("", systemImage: "flame")
-                        .labelStyle(TitleOnlyLabelStyle())
-                    Text("\(viewModel.user?.name) kcal")
-                        .font(.subheadline)
+        VStack(alignment: .leading) {
+            Text("Profile")
+                .font(.urbanBold(size: 32))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.top, 5)
+                .padding(.bottom, 10)
+            
+            HStack(alignment: .center, spacing: 16) {
+                if let avatar = UserManager.shared.getAvatarImage() {
+                    Image(uiImage: avatar)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 72, height: 72)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                } else {
+                    ZStack {
+                        Circle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 72, height: 72)
+                        
+                        Image(systemName: "person.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 48, height: 48)
+                            .foregroundColor(.black)
+                    }
                 }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(viewModel.user?.name ?? "")
+                        .font(.title2).bold()
+                    Text(viewModel.user?.email ?? "")
+                        .font(.subheadline).foregroundColor(.gray)
+
+                    HStack(spacing: 12) {
+                        Label(viewModel.user?.currentGoal ?? "", systemImage: "arrow.up.right")
+                            .labelStyle(IconOnlyLabelStyle())
+                            .foregroundColor(.green)
+                        Text("\(viewModel.user?.currentGoal?.capitalized ?? "")")
+                            .font(.subheadline)
+
+                        Label("", systemImage: "scalemass")
+                            .labelStyle(TitleOnlyLabelStyle())
+                        Text(String(format: "%.1f kg", viewModel.user?.weight ?? 0))
+                            .font(.subheadline)
+                    }
+                }
+                Spacer()
             }
-            Spacer()
         }
     }
+
 
     // MARK: - Options Sections
     private func optionSection(title: String, items: [ProfileOption]) -> some View {

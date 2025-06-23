@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TrackerCard: View {
     let tracker: TrackerInfo
+    let burned: Int
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -39,18 +40,18 @@ struct TrackerCard: View {
                 HStack {
                     Image(systemName: "flame.fill")
                         .foregroundColor(AppColors.exerciseColor)
-                    Text("\(200) kcal")
+                    Text("\(burned) kcal")
                         .font(AppFonts.caption)
                         .foregroundColor(AppColors.textSecondary)
                 }
-                
-                HStack {
-                    Image(systemName: "clock")
-                        .foregroundColor(AppColors.textSecondary)
-                    Text("1 h 30 min")
-                        .font(AppFonts.caption)
-                        .foregroundColor(AppColors.textSecondary)
-                }
+//                
+//                HStack {
+//                    Image(systemName: "clock")
+//                        .foregroundColor(AppColors.textSecondary)
+//                    Text("1 h 30 min")
+//                        .font(AppFonts.caption)
+//                        .foregroundColor(AppColors.textSecondary)
+//                }
             }
         }
         .padding()

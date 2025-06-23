@@ -16,6 +16,15 @@ class HomeViewController: UIViewController {
             viewModel: viewModel,
             onSelectMeal: { [weak self] meal in
                 self?.navigation.onTapMeal?(meal)
+            },
+            onTapAddNewTracker: { [weak self] in
+                self?.showTrackerView()
+            },
+            onTapNotification: { [weak self] in
+                self?.showNotification()
+            },
+            onTapTracker: { [weak self] type in
+                self?.showTrackerIncreasView(type)
             }
         ).convertSwiftUIToHosting()
     }()
@@ -36,8 +45,38 @@ class HomeViewController: UIViewController {
         
         viewModel.fetchFoodDiary()
         
+        fetchObserver = NotificationObserver(notificationName: .getProfile) { [weak self] _ in
+            self?.viewModel.fetchFoodDiary()
+        }
         fetchObserver = NotificationObserver(notificationName: .shouldFetchHomeData) { [weak self] _ in
             self?.viewModel.fetchFoodDiary()
         }
+    }
+    
+    private func showNotification() {
+        let vc = NotificationViewController(navigation: NotificationNavigation(onExitTap: { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }, editAction: {}))
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    private func showTrackerView() {
+        let vc = TrackNewTrackerViewController()
+        present(vc, animated: true)
+    }
+    
+    private func showTrackerIncreasView(_ tracker: TrackerData) {
+        let vc = TrackerIncreaseViewController(selectedType: tracker)
+        present(vc, animated: true)
+    }
+    
+    private func showComingSoonAlert() {
+        let alert = UIAlertController(
+            title: "Coming Soon",
+            message: "This feature will be available in the next release.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

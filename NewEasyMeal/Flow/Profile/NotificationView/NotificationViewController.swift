@@ -10,7 +10,9 @@ class NotificationViewController: BaseNavigationTransparentViewController {
     private let navigation: NotificationNavigation
     
     private lazy var rootView: Bridged = {
-        NotificationView().convertSwiftUIToHosting()
+        NotificationView(onExitTap: {
+            self.navigation.onExitTap()
+        }).convertSwiftUIToHosting()
     }()
     
     init(navigation: NotificationNavigation) {

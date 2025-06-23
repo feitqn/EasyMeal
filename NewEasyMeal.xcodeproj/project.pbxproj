@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D8380FC82DCC01B300BE9037 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = D8380FC72DCC01B300BE9037 /* GoogleSignIn */; };
+		D8380FCA2DCC01B300BE9037 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D8380FC92DCC01B300BE9037 /* GoogleSignInSwift */; };
 		D83CE2702DC8F88B00B48AD1 /* SkeletonUI in Frameworks */ = {isa = PBXBuildFile; productRef = D83CE26F2DC8F88B00B48AD1 /* SkeletonUI */; };
 		D8C96A992DBFFBD200E857D9 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = D8C96A982DBFFBD200E857D9 /* FirebaseAnalytics */; };
 		D8C96A9B2DBFFBD200E857D9 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = D8C96A9A2DBFFBD200E857D9 /* FirebaseAnalyticsOnDeviceConversion */; };
@@ -32,6 +34,7 @@
 		D8C96AC32DBFFBD200E857D9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = D8C96AC22DBFFBD200E857D9 /* FirebaseStorage */; };
 		D8C96AC52DBFFBF800E857D9 /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D8C96AC42DBFFBF800E857D9 /* FirebaseStorageCombine-Community */; };
 		D8C96AC72DBFFBF800E857D9 /* FirebaseVertexAI in Frameworks */ = {isa = PBXBuildFile; productRef = D8C96AC62DBFFBF800E857D9 /* FirebaseVertexAI */; };
+		D8F60BDC2DDCDE3E000026D3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D8F60BDB2DDCDE3E000026D3 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,17 +70,20 @@
 				D83CE2702DC8F88B00B48AD1 /* SkeletonUI in Frameworks */,
 				D8C96AB12DBFFBD200E857D9 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				D8C96AC72DBFFBF800E857D9 /* FirebaseVertexAI in Frameworks */,
+				D8380FC82DCC01B300BE9037 /* GoogleSignIn in Frameworks */,
 				D8C96AB32DBFFBD200E857D9 /* FirebaseFunctions in Frameworks */,
 				D8C96ABF2DBFFBD200E857D9 /* FirebasePerformance in Frameworks */,
 				D8C96AC52DBFFBF800E857D9 /* FirebaseStorageCombine-Community in Frameworks */,
 				D8C96AC12DBFFBD200E857D9 /* FirebaseRemoteConfig in Frameworks */,
 				D8C96AAB2DBFFBD200E857D9 /* FirebaseDatabase in Frameworks */,
+				D8380FCA2DCC01B300BE9037 /* GoogleSignInSwift in Frameworks */,
 				D8C96AAD2DBFFBD200E857D9 /* FirebaseDynamicLinks in Frameworks */,
 				D8C96A9F2DBFFBD200E857D9 /* FirebaseAppCheck in Frameworks */,
 				D8C96AA32DBFFBD200E857D9 /* FirebaseAuth in Frameworks */,
 				D8C96A992DBFFBD200E857D9 /* FirebaseAnalytics in Frameworks */,
 				D8C96AAF2DBFFBD200E857D9 /* FirebaseFirestore in Frameworks */,
 				D8C96ABD2DBFFBD200E857D9 /* FirebaseMessaging in Frameworks */,
+				D8F60BDC2DDCDE3E000026D3 /* Kingfisher in Frameworks */,
 				D8C96AB92DBFFBD200E857D9 /* FirebaseInstallations in Frameworks */,
 				D8C96AB52DBFFBD200E857D9 /* FirebaseFunctionsCombine-Community in Frameworks */,
 				D8C96AA12DBFFBD200E857D9 /* FirebaseAppDistribution-Beta in Frameworks */,
@@ -156,6 +162,9 @@
 				D8C96AC42DBFFBF800E857D9 /* FirebaseStorageCombine-Community */,
 				D8C96AC62DBFFBF800E857D9 /* FirebaseVertexAI */,
 				D83CE26F2DC8F88B00B48AD1 /* SkeletonUI */,
+				D8380FC72DCC01B300BE9037 /* GoogleSignIn */,
+				D8380FC92DCC01B300BE9037 /* GoogleSignInSwift */,
+				D8F60BDB2DDCDE3E000026D3 /* Kingfisher */,
 			);
 			productName = NewEasyMeal;
 			productReference = D86F91B92DBC19F500DCEE97 /* NewEasyMeal.app */;
@@ -188,6 +197,8 @@
 			packageReferences = (
 				D8C96A972DBFFBD200E857D9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				D83CE26E2DC8F88B00B48AD1 /* XCRemoteSwiftPackageReference "SkeletonUI" */,
+				D8380FC62DCC01B300BE9037 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				D8F60BDA2DDCDE3E000026D3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D86F91BA2DBC19F500DCEE97 /* Products */;
@@ -227,13 +238,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8BB3UWB5NY;
+				DEVELOPMENT_TEAM = 2AQ9W7SL2S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NewEasyMeal/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -259,13 +271,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8BB3UWB5NY;
+				DEVELOPMENT_TEAM = 2AQ9W7SL2S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NewEasyMeal/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -429,6 +442,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		D8380FC62DCC01B300BE9037 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		D83CE26E2DC8F88B00B48AD1 /* XCRemoteSwiftPackageReference "SkeletonUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CSolanaM/SkeletonUI.git";
@@ -445,9 +466,27 @@
 				minimumVersion = 11.12.0;
 			};
 		};
+		D8F60BDA2DDCDE3E000026D3 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D8380FC72DCC01B300BE9037 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8380FC62DCC01B300BE9037 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		D8380FC92DCC01B300BE9037 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8380FC62DCC01B300BE9037 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		D83CE26F2DC8F88B00B48AD1 /* SkeletonUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D83CE26E2DC8F88B00B48AD1 /* XCRemoteSwiftPackageReference "SkeletonUI" */;
@@ -572,6 +611,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D8C96A972DBFFBD200E857D9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseVertexAI;
+		};
+		D8F60BDB2DDCDE3E000026D3 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8F60BDA2DDCDE3E000026D3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,6 +1,5 @@
 import UIKit
 
-
 struct HealthGoalNavigation {
     var onExitTap: Callback
     var editAction: Callback
@@ -9,8 +8,12 @@ struct HealthGoalNavigation {
 class HealthGoalViewController: BaseNavigationTransparentViewController {
     private let navigation: HealthGoalNavigation
     
+    private let viewModel = HealthGoalsViewModel()
+    
     private lazy var rootView: Bridged = {
-        HealthGoalsView().convertSwiftUIToHosting()
+        HealthGoalsView(viewModel: viewModel, onTapExit: { [weak self] in
+            self?.navigation.onExitTap()
+        }).convertSwiftUIToHosting()
     }()
     
     init(navigation: HealthGoalNavigation) {

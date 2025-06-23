@@ -1,4 +1,5 @@
 import UIKit
+import SwiftUI
 
 enum FoodActionResultType {
     case success
@@ -118,6 +119,64 @@ final class FoodActionAlertView: UIView {
             iconImageView.tintColor = .systemRed
             titleLabel.text = "Failed to Add Food!"
             subtitleLabel.text = "Please try again later."
+        }
+    }
+}
+
+struct FoodActionAlertSwiftUIView: View {
+    var type: FoodActionResultType
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: iconName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 64, height: 64)
+                .foregroundColor(iconColor)
+
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.black)
+
+            Text(subtitle)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.vertical, 24)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity)
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+        .padding(.horizontal, 32)
+    }
+
+    private var iconName: String {
+        switch type {
+        case .success: return "hand.thumbsup.fill"
+        case .failure: return "xmark.circle.fill"
+        }
+    }
+
+    private var iconColor: Color {
+        switch type {
+        case .success: return .yellow
+        case .failure: return .red
+        }
+    }
+
+    private var title: String {
+        switch type {
+        case .success: return "Successfully Added!"
+        case .failure: return "Failed to Add Food!"
+        }
+    }
+
+    private var subtitle: String {
+        switch type {
+        case .success: return "Shopping list updated — keep going!"
+        case .failure: return "Please try again later."
         }
     }
 }

@@ -165,7 +165,7 @@ class TabCoordinator: NSObject, Coordinator {
             instVC.navigationController?.isNavigationBarHidden = true
             navController.pushViewController(instVC, animated: true)
         case .unik:
-            let goVC = ResultsViewController()
+            let goVC = ProgressOverviewViewController()
             goVC.navigationController?.isNavigationBarHidden = true
             navController.pushViewController(goVC, animated: true)
         case .profile:
@@ -196,26 +196,47 @@ class TabCoordinator: NSObject, Coordinator {
     private func handleAction(_ action: ProfileAction) {
         switch action {
         case .personalInfo:
-            let vc = PersonalInfoViewController(navigation: PersonalInfoNavigation(onExitTap: {}, editAction: {}))
+            let vc = PersonalInfoViewController(navigation: PersonalInfoNavigation(onExitTap: { [weak self] in
+                self?.navigationController.popViewController(animated: true)
+            }, editAction: {}))
             navigationController.pushViewController(vc, animated: true)
         case .healthGoal:
-            let vc = HealthGoalViewController(navigation: HealthGoalNavigation(onExitTap: {}, editAction: {}))
+            let vc = HealthGoalViewController(navigation: HealthGoalNavigation(onExitTap: { [weak self] in
+                self?.navigationController.popViewController(animated: true)
+            }, editAction: {}))
             navigationController.pushViewController(vc, animated: true)
         case .favourite:
-            break
+            showComingSoonAlert()
         case .shoppingList:
-            break
+            let vc = ShoppingListViewController(navigation: ShoppingListNavigation(onLogout: {}, onTapAction: { _ in
+                
+            }))
+            navigationController.pushViewController(vc, animated: true)
         case .notification:
-            let vc = NotificationViewController(navigation: NotificationNavigation(onExitTap: {}, editAction: {}))
+            let vc = NotificationViewController(navigation: NotificationNavigation(onExitTap: { [weak self] in
+                self?.navigationController.popViewController(animated: true)
+            }, editAction: {}))
             navigationController.pushViewController(vc, animated: true)
         case .faqs:
-            break
+            let vc = FAQViewController()
+            navigationController.pushViewController(vc, animated: true)
         case .contactUs:
-            break
+            let vc = ContactUsViewController()
+            navigationController.pushViewController(vc, animated: true)
         case .settings:
-            let vc = SettingsViewController(navigation: SettingsNavigation(onExitTap: {}, editAction: {}))
+            let vc = SettingsViewController()
             navigationController.pushViewController(vc, animated: true)
         }
+    }
+    
+    private func showComingSoonAlert() {
+        let alert = UIAlertController(
+            title: "Coming Soon",
+            message: "This feature will be available in the next release.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        navigationController.present(alert, animated: true, completion: nil)
     }
     
     func currentPage() -> TabBarPage? { TabBarPage.init(index: tabBarController.selectedIndex) }

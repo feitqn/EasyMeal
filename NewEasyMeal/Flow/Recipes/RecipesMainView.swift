@@ -1,9 +1,14 @@
 
 import SwiftUI
+import Kingfisher
 
 struct RecipesMainView: View {
     @ObservedObject var viewModel: RecipesMainViewModel
     @State private var selectedTab = 0
+    @State private var showAlert = false
+    @State private var alertType: FoodActionResultType = .success
+    var onTapAdded: Callback
+    var onTapShoppingList: Callback
     
     var body: some View {
 //        NavigationView {
@@ -15,6 +20,23 @@ struct RecipesMainView: View {
                     filterView
                 } else {
                     mainContentView
+                        .padding(.top, 1)
+                        .overlay(
+                            Group {
+                                if showAlert {
+                                    FoodActionAlertSwiftUIView(type: alertType)
+                                        .transition(.move(edge: .top).combined(with: .opacity))
+                                        .onAppear {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                withAnimation {
+                                                    showAlert = false
+                                                }
+                                            }
+                                        }
+                                }
+                            }
+                        )
+                        .animation(.easeInOut, value: showAlert)
                 }
             }
 //            .navigationBarHidden(true)
@@ -35,9 +57,9 @@ struct RecipesMainView: View {
                 categoryTabs
                 
                 // Recommendations
-                if !viewModel.recommendations.isEmpty {
-                    recommendationsSection
-                }
+//                if !viewModel.recommendations.isEmpty {
+//                    recommendationsSection
+//                }
                 
                 // Recipes by category
                 ForEach(viewModel.categories.filter { $0 != "All" }, id: \.self) { category in
@@ -187,12 +209,6 @@ struct RecipesMainView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("Hi, Normal")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
                 Text("Recipes")
                     .font(.title)
                     .fontWeight(.bold)
@@ -213,6 +229,15 @@ struct RecipesMainView: View {
                 viewModel.showFilterSheet = true
             }) {
                 Image(systemName: "slider.horizontal.3")
+                    .font(.title2)
+                    .foregroundColor(.black)
+                    .padding(.leading, 8)
+            }
+            
+            Button(action: {
+                onTapShoppingList()
+            }) {
+                Image("shoppingList")
                     .font(.title2)
                     .foregroundColor(.black)
                     .padding(.leading, 8)
@@ -272,15 +297,29 @@ struct RecipesMainView: View {
                 
                 Spacer()
                 
-                Text("View all")
-                    .font(.subheadline)
-                    .foregroundColor(.green)
+//                Text("View all")
+//                    .font(.subheadline)
+//                    .foregroundColor(.green)
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(viewModel.recommendations) { recipe in
-                        NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                        let view = RecipeDetailView(
+                            onLikeButtonTapped: {
+                                viewModel.toggleFavorite(for: recipe.id)
+                            },
+                            addToShoppingList: {
+                                viewModel.addItem(recipe) {
+                                    alertType = .success
+                                    showAlert = true
+                                }
+                            },
+                            showAlert: $showAlert,
+                            alertType: $alertType,
+                            recipe: recipe
+                        )
+                        NavigationLink(destination: view) {
                             RecipeCard(recipe: recipe)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -291,7 +330,7 @@ struct RecipesMainView: View {
         .padding(.top)
     }
     
-    private func recipeSection(title: String, recipes: [RecipeMain]) -> some View {
+    private func recipeSection(title: String, recipes: [FoodItem]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(title)
@@ -300,15 +339,29 @@ struct RecipesMainView: View {
                 
                 Spacer()
                 
-                Text("View all")
-                    .font(.subheadline)
-                    .foregroundColor(.green)
+//                Text("View all")
+//                    .font(.subheadline)
+//                    .foregroundColor(.green)
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(recipes) { recipe in
-                        NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                        let view = RecipeDetailView(
+                            onLikeButtonTapped: {
+                                viewModel.toggleFavorite(for: recipe.id)
+                            },
+                            addToShoppingList: {
+                                viewModel.addItem(recipe) {
+                                    alertType = .success
+                                    showAlert = true
+                                }
+                            },
+                            showAlert: $showAlert,
+                            alertType: $alertType,
+                            recipe: recipe
+                        )
+                        NavigationLink(destination: view) {
                             RecipeCard(recipe: recipe)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -363,16 +416,17 @@ struct CategoryButton: View {
 }
 
 struct RecipeCard: View {
-    let recipe: RecipeMain
+    let recipe: FoodItem
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack(alignment: .topTrailing) {
-                Image(recipe.imageName)
+                KFImage(URL(string: recipe.imageName))
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 160, height: 120)
                     .cornerRadius(12)
+                    .clipped()
                 
                 if recipe.isFavorite {
                     Image(systemName: "heart.fill")
@@ -381,7 +435,7 @@ struct RecipeCard: View {
                 }
             }
             
-            Text(recipe.title)
+            Text(recipe.name)
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .lineLimit(1)
@@ -455,94 +509,151 @@ struct FilterSection: View {
 }
 
 struct RecipeDetailView: View {
-    let recipe: RecipeMain
+    var onLikeButtonTapped: (() -> ())
+    var addToShoppingList: (() -> ())
+    
+    @Binding var showAlert: Bool
+    @Binding var alertType: FoodActionResultType
+    
+    @Environment(\.dismiss) var dismiss
+    var recipe: FoodItem
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Recipe image
-                Image(recipe.imageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 250)
-                    .clipped()
-                
+        Group {
+            let instructions = recipe.instructions ?? []
+            ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Recipe title
-                    Text(recipe.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    // Recipe info
-                    HStack {
-                        Label("\(recipe.cookTime) min", systemImage: "clock")
-                        
-                        Spacer()
-                        
-                        Label(recipe.category, systemImage: "tag")
-                        
-                        Spacer()
-                        
-                        Label(recipe.cookingMethod, systemImage: "flame")
-                    }
-                    .foregroundColor(.gray)
-                    
-                    // Tags
-                    if !recipe.tags.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
+                    ZStack {
+                        KFImage(URL(string: recipe.imageName))
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: UIScreen.main.bounds.width, height: 250)
+                            .clipped()
+
+                        VStack {
                             HStack {
-                                ForEach(recipe.tags, id: \.self) { tag in
-                                    Text(tag)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.gray.opacity(0.1))
-                                        .cornerRadius(20)
+                                Button(action: {
+                                    dismiss()
+                                }) {
+                                    Image(systemName: "chevron.left")
+                                        .padding()
+                                        .background(Color.white)
+                                        .clipShape(Circle())
+                                        .shadow(color: Color.gray.opacity(0.2), radius: 2)
                                 }
+                                Spacer()
+                                Button(action: {
+                                    onLikeButtonTapped()
+                                }) {
+                                    Image(systemName: "heart")
+                                        .foregroundColor(.yellow)
+                                        .symbolVariant(recipe.isFavorite ? .fill : .none)
+                                        .padding()
+                                        .shadow(color: Color.gray.opacity(0.2), radius: 2)
+                                }
+                            }.padding(.top, 16)
+                            
+                            Spacer()
+                        }.padding(.leading, 16)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 16) {
+                        // Recipe title
+                        Text(recipe.name)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        // Recipe info
+                        HStack {
+                            Label("\(recipe.cookTime) min", systemImage: "clock")
+                            
+                            Spacer()
+                            
+                            Label(recipe.category, systemImage: "tag")
+                            
+                            Spacer()
+                            
+                            Label(recipe.cookingMethod ?? "", systemImage: "flame")
+                        }
+                        .foregroundColor(.gray)
+                        
+                        HStack(spacing: 12) {
+                            Spacer()
+                            NutritionCircle(label: "#Calorie", value: recipe.calories)
+                            NutritionCircle(label: "#Protein", value: recipe.nutrition.protein)
+                            NutritionCircle(label: "#Carbs", value: recipe.nutrition.carbs)
+                            NutritionCircle(label: "#Fats", value: recipe.nutrition.fats)
+                            Spacer()
+                        }
+                        
+                        Divider()
+                        
+                        // Ingredients title
+                        Text("Ingredients")
+                            .font(.headline)
+                            .padding(.top, 8)
+                        
+                        // Sample ingredients
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(recipe.ingredients ?? [], id: \.self) { ingredient in
+                                Text("• \(ingredient)")
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        // Instructions title
+                        Text("Instructions")
+                            .font(.headline)
+                            .padding(.top, 8)
+                        
+                        // Sample instructions
+                        VStack(alignment: .leading, spacing: 12) {
+                            ForEach(Array(instructions.enumerated()), id: \.offset) { index, step in
+                                instructionStep(number: index + 1, text: step)
                             }
                         }
                     }
+                    .padding()
                     
-                    Divider()
-                    
-                    // Ingredients title
-                    Text("Ingredients")
-                        .font(.headline)
-                        .padding(.top, 8)
-                    
-                    // Sample ingredients
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("• 2 eggs")
-                        Text("• 200g flour")
-                        Text("• 100ml milk")
-                        Text("• 1 tbsp sugar")
-                        Text("• 1 tsp salt")
-                    }
-                    
-                    Divider()
-                    
-                    // Instructions title
-                    Text("Instructions")
-                        .font(.headline)
-                        .padding(.top, 8)
-                    
-                    // Sample instructions
-                    VStack(alignment: .leading, spacing: 12) {
-                        instructionStep(number: 1, text: "Mix all dry ingredients in a bowl")
-                        instructionStep(number: 2, text: "Add eggs and milk, whisk until smooth")
-                        instructionStep(number: 3, text: "Heat a pan and cook until golden")
+                    HStack {
+                        Spacer()
+                        
+                        CustomButtonView(title: "Add to shopping list") {
+                            addToShoppingList()
+                        }
+                        .frame(width: 300, height: 60)
+                        .padding(.top, 42)
+                        .padding(.bottom, 16)
+                        
+                        Spacer()
                     }
                 }
-                .padding()
             }
+            .overlay(
+                Group {
+                    if showAlert {
+                        FoodActionAlertSwiftUIView(type: alertType)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        showAlert = false
+                                    }
+                                }
+                            }
+                    }
+                }
+            )
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: Button(action: {
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Image(systemName: "arrow.left")
+                    .foregroundColor(.black)
+            })
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            presentationMode.wrappedValue.dismiss()
-        }) {
-            Image(systemName: "arrow.left")
-                .foregroundColor(.black)
-        })
     }
     
     private func instructionStep(number: Int, text: String) -> some View {
@@ -563,13 +674,4 @@ struct RecipeDetailView: View {
         }
     }
 }
-
-struct ContentView: View {
-    @StateObject var viewModel = RecipesMainViewModel()
-    
-    var body: some View {
-        RecipesMainView(viewModel: viewModel)
-    }
-}
-
 

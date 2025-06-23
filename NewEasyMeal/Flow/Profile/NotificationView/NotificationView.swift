@@ -2,12 +2,14 @@ import SwiftUI
 
 // MARK: - Notifications View
 struct NotificationView: View {
+    var onExitTap: (() -> Void)?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
                 Button(action: {
-               
+                    onExitTap?()
                 }) {
                     Image(systemName: "chevron.left")
                         .padding()

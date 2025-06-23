@@ -2,10 +2,14 @@ import SwiftUI
 
 @MainActor
 final class HomeViewModel: ObservableObject {
+    @Published var userName: String = ""
     @Published var isLoading: Bool = true
     @Published var leftKcal = 0
     @Published var eaten = 0
     @Published var burned = 0
+    @Published var currentWeight: Double = 0
+    @Published var overallCalories: Int = 0
+    @Published var goalWeight: Double = 0
     
     @Published var nutritionData: [Nutrition] = []
     
@@ -13,33 +17,42 @@ final class HomeViewModel: ObservableObject {
     
     @Published var trackerData: [TrackerInfo] = []
     
-    @Published var weeklyTrackers = [
-        WeeklyTracker(title: "Track Your Water Intake", goal: "2.00 L", color: Color.blue, iconName: "drop.fill", daysCompleted: 0)
-    //  ,
-      // WeeklyTracker(title: "Track Your Weekly Fruit Intake", goal: "1 or 2 fruits per day", color: AppColors.fruitColor, iconName: "apple.logo", daysCompleted: 0),
-       //WeeklyTracker(title: "Track Your Weekly Vegetable Intake", goal: "1 or 2 vegetables per day", color: AppColors.vegetableColor, iconName: //"leaf.fill", daysCompleted: 0),
-//        WeeklyTracker(title: "Track Your Weekly Protein Intake", goal: "0.8g per kg of body weight", color: AppColors.proteinTrackerColor, iconName: "takeoutbag.and.cup.and.straw.fill", daysCompleted: 0),
-//        WeeklyTracker(title: "Track Your Steps Weekly", goal: "10000", color: AppColors.stepsColor, iconName: "figure.walk", daysCompleted: 0),
-//        WeeklyTracker(title: "Weekly No Sugar Challenge", goal: "0g of added sugar per day", color: AppColors.noSugarColor, iconName: "circle", daysCompleted: 0),
-//        WeeklyTracker(title: "Weekly No Fast Food Challenge", goal: "0 fast food meals per day", color: AppColors.noFastFoodColor, iconName: "bag.fill", daysCompleted: 0),
-//        WeeklyTracker(title: "Weekly No Late-Night Eating Challenge", goal: "No food after 8:00 PM", color: AppColors.noLateNightColor, iconName: "moon.stars.fill", daysCompleted: 0)
-    ]
+    @Published var weeklyTrackers: [TrackerData] = []
+    
+    func upload() {
+        Task {
+            do {
+                try await APIHelper.shared.uploadMockRecipesToFirebase()
+            } catch {
+                print(error)
+            }
+        }
+    }
     
     func fetchFoodDiary() {
         Task {
             do {
                 self.isLoading = true
+                let user = try await APIHelper.shared.fetchProfile()
+                userName = user.name
                 let diary = try await APIHelper.shared.fetchFoodDiary()
                 if let diary = diary {
-                    self.eaten = diary.eatenCalories
-                    self.burned = diary.burnedCalories
-                    self.leftKcal = diary.remainingCalories
-                    self.nutritionData = diary.nutrition
-                    self.mealData = diary.meals
-                    self.trackerData = [TrackerInfo(title: "Steps", value: "\(diary.steps.current)", goal: "\(diary.steps.target)", progress: CGFloat(diary.steps.current / diary.steps.target)),TrackerInfo(title: "Exercise", value: "", goal: "", progress: 0)]
+                    self.overallCalories = diary.overallCalories ?? 0
+                    self.eaten = diary.eatenCalories ?? 0
+                    self.burned = diary.burnedCalories ?? 0
+                    self.leftKcal = diary.remainingCalories ?? 0
+                    self.nutritionData = diary.nutrition ?? []
+                    self.mealData = diary.meals ?? []
                     self.isLoading = false
+                    self.weeklyTrackers = diary.trackers ?? []
+                    self.currentWeight = diary.currentWeight ?? 70
+                    self.goalWeight = user.targetWeight
+                    if let steps = diary.trackers?.first(where: { $0.trackerType == .steps }) {
+                        self.burned = Int(caloriesBurned(steps: Int(steps.currentValue), weightKg: currentWeight))
+                        self.trackerData = [TrackerInfo(title: "Steps", value: "\(steps.currentValue)", goal: "\(diary.steps?.target ?? 0)", progress: CGFloat((diary.steps?.current ?? 0) / (diary.steps?.target ?? 0))), TrackerInfo(title: "Exercise", value: "", goal: "", progress: 0)   ]
+                    }
                 } else {
-                    guard let userProfile = UserManager.shared.getUserProfile(), let goal = userProfile.currentGoal   else {
+                    guard let userProfile = UserManager.shared.getUserProfile(), let goal = userProfile.currentGoal else {
                         return
                     }
                     
@@ -52,5 +65,36 @@ final class HomeViewModel: ObservableObject {
                 print(error)
             }
         }
+    }
+    
+    func getProfile() {
+        Task {
+            do {
+                let user = try await APIHelper.shared.fetchProfile()
+                userName
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    func updateWeight(weight: Double) {
+        guard let userProfile = UserManager.shared.getUserProfile() else {
+            return
+        }
+        Task {
+            do {
+                APIHelper.shared.updateCurrentWeight(weight)
+                currentWeight = weight
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    func caloriesBurned(steps: Int, weightKg: Double) -> Double {
+        // Среднее количество калорий, сжигаемых на 1 шаг (примерно 0.04-0.06 ккал для веса 70 кг)
+        let caloriesPerStep = 0.0005 * weightKg
+        return Double(steps) * caloriesPerStep
     }
 }

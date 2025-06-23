@@ -19,7 +19,15 @@ class LoginCoordinator: LoginCoordinatorProtocol {
     }
         
     func start() {
-        showLoginViewController()
+        if UserManager.shared.isFirstLaunch {
+            let vc = LaunchScreenViewController()
+            vc.onTapGetStarted = { [weak self] in
+                self?.showLoginViewController()
+            }
+            navigationController.pushViewController(vc, animated: true)
+        } else {
+            showLoginViewController()
+        }
     }
     
     deinit {
@@ -31,6 +39,8 @@ class LoginCoordinator: LoginCoordinatorProtocol {
             self.finish()
         }, onRegisterTap: {
             self.runRegister()
+        }, onGoogleRegisterTap: {
+            self.runOnboarding()
         }))
         
         navigationController.pushViewController(loginVC, animated: true)
@@ -41,6 +51,8 @@ class LoginCoordinator: LoginCoordinatorProtocol {
             self.runOnboarding()
         }, onLoginTap: {
             self.navigationController.popViewController(animated: true)
+        }, onTapLoginGoogle: {
+            self.finish()
         }))
         navigationController.pushViewController(rg, animated: true)
     }

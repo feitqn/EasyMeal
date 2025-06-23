@@ -19,6 +19,8 @@ struct ProfileNavigation {
 class ProfileViewController: UIViewController {
     var navigation: ProfileNavigation
     
+    private var fetchObserver: NotificationObserver?
+    
     var viewModel = ProfileViewModel(user: UserManager.shared.getUserProfile())
     
     var profileItems: [ProfileOption] = [
@@ -27,7 +29,6 @@ class ProfileViewController: UIViewController {
     ]
     
     var servicesItems: [ProfileOption] = [
-        .init(icon: "heart", title: "Favourite Recipes", action: .favourite),
         .init(icon: "list.bullet", title: "Shopping List", action: .shoppingList),
         .init(icon: "bell", title: "Notification", action: .notification)
     ]
@@ -65,6 +66,12 @@ class ProfileViewController: UIViewController {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
         setupSwiftUI(rootView)
+        
+        viewModel.getProfile()
+        
+        fetchObserver = NotificationObserver(notificationName: .getProfile) { [weak self] _ in
+            self?.viewModel.getProfile()
+        }
     }
     
     private func didTapAction(_ action: ProfileAction) {

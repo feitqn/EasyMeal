@@ -1,7 +1,7 @@
 import SwiftUI
+import Kingfisher
 
 enum LogCategory: String, CaseIterable, Identifiable {
-    case products = "Products"
     case recipes = "Recipes"
     case favourites = "Favourites"
 
@@ -9,7 +9,6 @@ enum LogCategory: String, CaseIterable, Identifiable {
 
     var iconName: String {
         switch self {
-        case .products: return "leaf.fill"
         case .recipes: return "book.fill"
         case .favourites: return "bookmark.fill"
         }
@@ -17,7 +16,6 @@ enum LogCategory: String, CaseIterable, Identifiable {
     
     var iconColor: Color {
         switch self {
-        case .products: return Color.green
         case .recipes: return Color.orange
         case .favourites: return Color.yellow
         }
@@ -30,15 +28,29 @@ enum LogCategory: String, CaseIterable, Identifiable {
 
 // MARK: - Models
 
-struct FoodItem: Identifiable {
-    let id = UUID()
+struct FoodItem: Identifiable, Hashable, Codable {
+    let id: String
     let name: String
     let calories: Int
     let detail: String
     let nutrition: NutritionInfo
-    
+    let imageName: String
+    var cookTime: Int
+    var isFavorite: Bool = true
+    var ingredients: [String]?
+    var instructions: [String]?
+    var cookingMethod: String?
+    var category: String
+    var isInShoppingList: Bool = false
     // Adding this for filtering items based on category
-    var category: LogCategory = .products
+//    var category: LogCategory = .products
+}
+
+struct NutritionInfo: Identifiable, Hashable, Codable {
+    let id = UUID()
+    let protein: Int
+    let carbs: Int
+    let fats: Int
 }
 
 // MARK: - Components
@@ -75,7 +87,14 @@ struct FoodItemRow: View {
     
     var body: some View {
         HStack {
+            KFImage(URL(string: item.imageName))
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 40, height: 40)
+                .cornerRadius(10)
+                .clipped()
             VStack(alignment: .leading, spacing: 4) {
+
                 Text(item.name)
                     .font(.system(size: 18, weight: .bold))
                 
@@ -87,13 +106,6 @@ struct FoodItemRow: View {
                     Text("\(item.calories) Cal")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.black)
-                    
-                    Text("•")
-                        .foregroundColor(.gray)
-                    
-                    Text(item.detail)
-                        .font(.system(size: 14))
-                        .foregroundColor(.gray)
                 }
             }
             
@@ -116,25 +128,14 @@ struct FoodItemRow: View {
 // MARK: - Main View
 
 struct LogView: View {
-    @State private var searchText: String = ""
-    @State private var selectedCategory: LogCategory = .products
-    @State private var showCancelButton: Bool = false
+
     
+    var mealType: MealType
     let onExitTap: Callback
     let onAddTap: ((FoodItem) -> ())?
     
     // Sample food items with some assigned to different categories
-    private let foodItems: [FoodItem] = [
-        .init(name: "Actimel (Danone)", calories: 59, detail: "1 bottle (100 g)", nutrition: NutritionInfo(protein: 10, carbs: 30, fats: 40)),
-        .init(name: "Activia Strawberry (Danone)", calories: 73, detail: "1 package (115 g)", nutrition: NutritionInfo(protein: 30, carbs: 20, fats: 100)),
-    ]
-    
-    var filteredItems: [FoodItem] {
-        let categorizedItems = foodItems.filter { $0.category == selectedCategory }
-        
-        guard !searchText.isEmpty else { return categorizedItems }
-        return categorizedItems.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-    }
+    @ObservedObject var viewModel: LogMainViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -175,7 +176,7 @@ struct LogView: View {
             
             Spacer()
             
-            Text("Log Your Breakfast")
+            Text("Log Your \(mealType.rawValue)")
                 .font(.system(size: 22, weight: .bold))
             
             Spacer()
@@ -194,12 +195,12 @@ struct LogView: View {
                     .foregroundColor(.gray)
                     .padding(.leading, 15)
                 
-                TextField("Search...", text: $searchText)
+                TextField("Search...", text: $viewModel.searchText)
                     .font(.system(size: 16))
                     .padding(.vertical, 12)
                 
-                if !searchText.isEmpty {
-                    Button(action: { searchText = "" }) {
+                if !viewModel.searchText.isEmpty {
+                    Button(action: { viewModel.searchText = "" }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.gray)
                             .padding(.trailing, 15)
@@ -218,8 +219,11 @@ struct LogView: View {
                 ForEach(LogCategory.allCases) { category in
                     CategoryButtonDemo(
                         category: category,
-                        isSelected: category == selectedCategory,
-                        action: { selectedCategory = category }
+                        isSelected: category == viewModel.selectedCategory,
+                        action: {
+                            viewModel.selectedCategory = category
+                            viewModel.fetchFoodItems()
+                        }
                     )
                 }
             }
@@ -230,7 +234,7 @@ struct LogView: View {
     private var itemList: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(filteredItems) { item in
+                ForEach(viewModel.filteredItems) { item in
                     FoodItemRow(item: item) {
                         onAddTap?(item)
                     }
@@ -240,12 +244,5 @@ struct LogView: View {
                 Color.clear.frame(height: 20)
             }
         }
-    }
-}
-
-// MARK: - Preview
-struct LogView_Previews: PreviewProvider {
-    static var previews: some View {
-        LogView(onExitTap: {}, onAddTap: { _ in})
     }
 }

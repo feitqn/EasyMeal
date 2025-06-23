@@ -21,6 +21,7 @@ enum Gender: String, CaseIterable, Identifiable {
     }
 }
 
+// OnboardingViewModel.swift
 class OnboardingViewModel: ObservableObject {
     @Published var step: OnboardingStep = .goal
     @Published var selectedGoal: WeightGoal?
@@ -29,7 +30,7 @@ class OnboardingViewModel: ObservableObject {
     @Published var height: Double = 170
     @Published var weight: Double = 70
     @Published var targetWeight: Double = 65
-    var profile: UserProfile?
+    var profile: UserProfile? = UserManager.shared.getUserProfile() ?? nil
     
     var isContinueEnabled: Bool {
         switch step {
@@ -53,6 +54,7 @@ class OnboardingViewModel: ObservableObject {
             profile?.gender = selectedGender?.rawValue
             step = .birthday
         case .birthday:
+            profile?.birthDate = birthdate
             step = .height
         case .height:
             profile?.height = Int(height)

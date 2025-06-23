@@ -8,9 +8,12 @@ struct PersonalInfoNavigation {
 
 class PersonalInfoViewController: BaseNavigationTransparentViewController {
     private let navigation: PersonalInfoNavigation
+    private let viewModel = PersonalInfoViewModel()
     
     private lazy var rootView: Bridged = {
-        PersonalInfoView().convertSwiftUIToHosting()
+        PersonalInfoView(onTapExit: {
+            self.navigation.onExitTap()
+        }, viewModel: viewModel).convertSwiftUIToHosting()
     }()
     
     init(navigation: PersonalInfoNavigation) {
