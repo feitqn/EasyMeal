@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 class SelectGoalViewModel: ObservableObject {

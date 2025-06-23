@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 
 @MainActor
@@ -10,7 +9,7 @@ class RecipesMainViewModel: ObservableObject {
     @Published var isFavoritesMode: Bool = false {
         didSet { applyFilters() }
     }
-    @Published var categories: [String] = ["All", "Breakfast", "Lunch", "Dinner", "Snack"]
+    @Published var categories: [String] = ["All", "Breakfast", "Lunch", "Dinner", "Snacks"]
     @Published var searchText: String = "" {
         didSet { applyFilters() }
     }
@@ -32,7 +31,7 @@ class RecipesMainViewModel: ObservableObject {
     }
     @Published var allRecipes: [FoodItem] = []
     
-    var dateTypes: [String] = ["All", "Breakfast", "Brunch", "Lunch", "Snack", "Dinner"]
+    var dateTypes: [String] = ["All", "Breakfast", "Brunch", "Lunch", "Snacks", "Dinner"]
     var cookTimes: [String] = ["All", "Under 10 min", "Under 20 min", "Under 30 min"]
     var suggestedDishes: [String] = ["All", "Vegetarian", "Beverage", "Gluten Free", "Sugar Free", "Low Fat"]
     var cookingMethods: [String] = ["All", "Grilled", "Baked", "Fried", "Steamed", "Raw (No Cook)"]

@@ -7,7 +7,8 @@ class LogMainViewModel: ObservableObject {
     @Published var selectedCategory: LogCategory = .recipes
     @Published var showCancelButton: Bool = false
     
-    let mealType: MealType
+    private let mealType: MealType
+    
     
     init(mealType: MealType) {
         self.mealType = mealType
@@ -25,10 +26,33 @@ class LogMainViewModel: ObservableObject {
             do {
                 foodItems = try await APIHelper.shared.fetchRecipes()
                 foodItems = selectedCategory == .favourites ? foodItems.filter { $0.isFavorite } : foodItems
-                foodItems = foodItems.filter { $0.category == mealType.rawValue }
+                let type = mealType.mapToRecipeType()
+                foodItems = foodItems.filter { $0.category == type.rawValue }
             } catch {
                 print(error)
             }
+        }
+    }
+}
+
+enum RecipesType: String {
+    case breakFast = "Breakfast"
+    case lunch = "Lunch"
+    case snack = "Snacks"
+    case dinner = "Dinner"
+}
+
+extension MealType {
+    func mapToRecipeType() -> RecipesType {
+        switch self {
+        case .breakFast:
+            return .breakFast
+        case .lunch:
+            return .lunch
+        case .snack:
+            return .snack
+        case .dinner:
+            return .dinner
         }
     }
 }

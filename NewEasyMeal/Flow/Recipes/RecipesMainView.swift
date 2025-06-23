@@ -1,4 +1,5 @@
 
+
 import SwiftUI
 import Kingfisher
 
@@ -100,43 +101,60 @@ struct RecipesMainView: View {
             Divider()
             
             // Recent searches
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Recent searches")
-                    .font(.headline)
-                    .padding(.horizontal)
-                
-                ForEach(["Broccoli salad", "Toast", "Noodles"], id: \.self) { search in
-                    Button(action: {
-                        viewModel.searchText = search
-                    }) {
-                        HStack {
-                            Image(systemName: "clock.arrow.circlepath")
-                                .foregroundColor(.gray)
-                            Text(search)
-                                .foregroundColor(.black)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-            }
+//            VStack(alignment: .leading, spacing: 12) {
+//                Text("Recent searches")
+//                    .font(.headline)
+//                    .padding(.horizontal)
+//                
+//                ForEach(["Broccoli salad", "Toast", "Noodles"], id: \.self) { search in
+//                    Button(action: {
+//                        viewModel.searchText = search
+//                    }) {
+//                        HStack {
+//                            Image(systemName: "clock.arrow.circlepath")
+//                                .foregroundColor(.gray)
+//                            Text(search)
+//                                .foregroundColor(.black)
+//                            Spacer()
+//                        }
+//                        .padding(.horizontal)
+//                    }
+//                }
+//            }
             
-            Divider()
             
             // Search results
             if !viewModel.searchText.isEmpty {
                 if viewModel.filteredRecipes.isEmpty {
                     VStack(spacing: 20) {
-                        Spacer()
-                        Text("No recipes matched your search.")
-                            .foregroundColor(.gray)
-                        Spacer()
+                        HStack {
+                            Spacer()
+                            Text("No recipes matched your search.")
+                                .foregroundColor(.gray)
+                            Spacer()
+                        }
                     }
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                             ForEach(viewModel.filteredRecipes) { recipe in
-                                RecipeCard(recipe: recipe)
+                                let view = RecipeDetailView(
+                                    onLikeButtonTapped: {
+                                        viewModel.toggleFavorite(for: recipe.id)
+                                    },
+                                    addToShoppingList: {
+                                        viewModel.addItem(recipe) {
+                                            alertType = .success
+                                            showAlert = true
+                                        }
+                                    },
+                                    showAlert: $showAlert,
+                                    alertType: $alertType,
+                                    recipe: recipe
+                                )
+                                NavigationLink(destination: view) {
+                                    RecipeCard(recipe: recipe)
+                                }
                             }
                         }
                         .padding()
@@ -382,7 +400,7 @@ struct RecipesMainView: View {
             return "fork.knife"
         case "Dinner":
             return "moon.stars"
-        case "Snack":
+        case "Snacks":
             return "carrot"
         default:
             return "circle"
@@ -464,15 +482,6 @@ struct SearchBar: View {
             
             TextField("Search", text: $text)
                 .foregroundColor(.primary)
-            
-            if !text.isEmpty {
-                Button(action: {
-                    text = ""
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.gray)
-                }
-            }
         }
         .padding(8)
         .background(Color(.systemGray6))

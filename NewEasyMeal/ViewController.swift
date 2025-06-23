@@ -1,3 +1,9 @@
+//
+//  ViewController.swift
+//  NewEasyMeal
+//
+//  Created by Али Айболатов on 26.04.2025.
+//
 
 import UIKit
 
